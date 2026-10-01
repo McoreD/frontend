@@ -84,7 +84,10 @@
       </div>
     </div>
 
-    <p v-if="!target" class="day-timeline-hint">
+    <p v-if="!Object.keys(devices).length" class="day-timeline-hint">
+      {{ $t("Loading...") }}
+    </p>
+    <p v-else-if="!target" class="day-timeline-hint">
       {{ $t("Select a user and device to see their timeline.") }}
     </p>
     <p v-else-if="segments.length === 0" class="day-timeline-hint">

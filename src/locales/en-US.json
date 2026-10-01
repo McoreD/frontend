@@ -57,5 +57,6 @@
   "Select a user and device to see their timeline.": "Select a user and device to see their timeline.",
   "No locations on this day.": "No locations on this day.",
   "Moving": "Moving",
-  "From {time}": "From {time}"
+  "From {time}": "From {time}",
+  "Loading...": "Loading..."
 }
