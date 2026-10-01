@@ -65,7 +65,9 @@ const loadData = async ({ dispatch }) => {
   await dispatch("getLastLocations");
   await dispatch("getLocationHistory");
   await dispatch("getRecorderVersion");
-  await dispatch("connectWebsocket");
+  if (config.api.websocket) {
+    await dispatch("connectWebsocket");
+  }
 };
 
 /**
