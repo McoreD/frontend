@@ -11,6 +11,7 @@ const DEFAULT_CONFIG = {
   api: {
     baseUrl: `${window.location.protocol}//${window.location.host}`,
     fetchOptions: {},
+    websocket: true,
   },
   endDateTime,
   filters: {

@@ -25,6 +25,7 @@ window.owntracks.config = {};
 - `api`
   - [`baseUrl`](#apibaseurl)
   - [`fetchOptions`](#apifetchoptions)
+  - [`websocket`](#apiwebsocket)
 - [`endDateTime`](#enddatetime)
 - `filters`
   - [`minAccuracy`](#filtersminaccuracy)
@@ -113,6 +114,24 @@ You can use this for example to send custom HTTP headers or to include cookies i
       fetchOptions: {
         credentials: "include",
       },
+    },
+  };
+  ```
+
+### `api.websocket`
+
+Whether to connect to the recorder's WebSocket API (`/ws/last`) for live location
+updates. Disable this if the backend serving the HTTP API does not provide the
+WebSocket endpoint, otherwise the frontend keeps trying to reconnect.
+
+- Type: [`Boolean`]
+- Default: `true`
+- Example:
+  ```js
+  // Only use the HTTP API
+  window.owntracks.config = {
+    api: {
+      websocket: false,
     },
   };
   ```
