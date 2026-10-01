@@ -80,6 +80,18 @@
         </date-picker>
       </div>
       <div class="nav-item">
+        <ClockIcon size="1x" aria-hidden="true" role="img" />
+        <button
+          class="button button-outline"
+          :class="{ 'button-active': timeline.open }"
+          :title="$t('Show the selected day as a timeline of stays and moves')"
+          :aria-pressed="timeline.open ? 'true' : 'false'"
+          @click="setTimelineOpen(!timeline.open)"
+        >
+          {{ $t("Timeline") }}
+        </button>
+      </div>
+      <div class="nav-item">
         <UserIcon size="1x" aria-hidden="true" role="img" />
         <select
           v-model="selectedUser"
@@ -151,6 +163,7 @@ import {
   ArrowDownIcon,
   ArrowUpIcon,
   CalendarIcon,
+  ClockIcon,
   CrosshairIcon,
   InfoIcon,
   LayersIcon,
@@ -172,6 +185,7 @@ export default {
     ArrowDownIcon,
     ArrowUpIcon,
     CalendarIcon,
+    ClockIcon,
     CrosshairIcon,
     DatePicker,
     InfoIcon,
@@ -303,6 +317,7 @@ export default {
       "distanceTravelled",
       "elevationGain",
       "elevationLoss",
+      "timeline",
     ]),
     selectedUser: {
       get() {
@@ -346,6 +361,7 @@ export default {
   methods: {
     ...mapMutations({
       setMapLayerVisibility: types.SET_MAP_LAYER_VISIBILITY,
+      setTimelineOpen: types.SET_TIMELINE_OPEN,
     }),
     ...mapActions([
       "setSelectedUser",
@@ -366,6 +382,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.button.button-outline.button-active {
+  color: var(--color-primary);
+  background: var(--color-primary-text);
+}
+
 .distance-travelled {
   text-align: right;
   line-height: 1.2;

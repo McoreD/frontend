@@ -87,6 +87,14 @@ const DEFAULT_CONFIG = {
   selectedUser: null,
   showDistanceTravelled: true,
   startDateTime,
+  timeline: {
+    gapMinutes: 15,
+    maxAccuracy: 500,
+    minStayMinutes: 10,
+    open: false,
+    stayRadius: 150,
+    travelSpeed: 30,
+  },
   verbose: false,
 };
 

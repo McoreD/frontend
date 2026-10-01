@@ -41,6 +41,9 @@ const populateStateFromQuery = ({ state, commit }, query) => {
   if (query.device) {
     commit(types.SET_SELECTED_DEVICE, query.device);
   }
+  if (query.timeline !== undefined) {
+    commit(types.SET_TIMELINE_OPEN, query.timeline === "1");
+  }
   if (query.layers) {
     const activeLayers = query.layers.split(",");
     Object.keys(state.map.layers).forEach((layer) => {
@@ -248,6 +251,17 @@ const setStartDateTime = async ({ commit, dispatch }, startDateTime) => {
 };
 
 /**
+ * Set start and end date and time together, reloading the data only once.
+ *
+ * @param {{start: String, end: String}} range Start and end datetimes in UTC
+ */
+const setDateTimeRange = async ({ commit, dispatch }, { start, end }) => {
+  commit(types.SET_START_DATE_TIME, start);
+  commit(types.SET_END_DATE_TIME, end);
+  await dispatch("reloadData");
+};
+
+/**
  * Set the end date and time for loading data and reload the location history.
  *
  * @param {String} endDateTime End date and time in UTC for loading data
@@ -271,4 +285,5 @@ export default {
   setSelectedDevice,
   setStartDateTime,
   setEndDateTime,
+  setDateTimeRange,
 };

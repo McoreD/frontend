@@ -71,6 +71,7 @@ window.owntracks.config = {};
 - [`selectedUser`](#selecteduser)
 - [`showDistanceTravelled`](#showdistancetravelled)
 - [`startDateTime`](#startdatetime)
+- [`timeline`](#timeline)
 - [`verbose`](#verbose)
 
 ### `api.baseUrl`
@@ -562,6 +563,46 @@ Initial start date and time (browser timezone) for fetched data.
   startDateTime.setDate(1);
   window.owntracks.config = {
     startDateTime,
+  };
+  ```
+
+### `timeline`
+
+Settings for the day timeline panel ("Timeline" button in the header). It shows
+one day of the selected user/device as a list of stays and moves, with a month
+calendar marking days that have data. Clicking an entry highlights it on the map.
+
+Stays are detected from the location history alone, so this works with any
+recorder data. Places are named after the region (`inregions`), point of
+interest (`poi`) or address (`addr`) of their locations, when available.
+
+- Type: [`Object`]
+- Default:
+  ```js
+  {
+    // Ignore locations with a worse accuracy than this (meters), or null
+    maxAccuracy: 500,
+    // Locations within this many meters of each other form one place
+    stayRadius: 150,
+    // Spending at least this long at a place makes it a stay
+    minStayMinutes: 10,
+    // A silence longer than this before leaving a place counts as time spent
+    // there (the apps report rarely while not moving)
+    gapMinutes: 15,
+    // Assumed speed (km/h) to estimate when a stay ended before such a silence
+    travelSpeed: 30,
+    // Show the panel when the page loads (also set by `?timeline=1`)
+    open: false,
+  }
+  ```
+- Example:
+  ```js
+  // Treat shorter visits as stays and open the panel by default
+  window.owntracks.config = {
+    timeline: {
+      minStayMinutes: 5,
+      open: true,
+    },
   };
   ```
 

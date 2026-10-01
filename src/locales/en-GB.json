@@ -44,5 +44,18 @@
   "30 days": "30 days",
   "3 months": "3 months",
   "6 months": "6 months",
-  "1 year": "1 year"
+  "1 year": "1 year",
+  "Timeline": "Timeline",
+  "Show the selected day as a timeline of stays and moves": "Show the selected day as a timeline of stays and moves",
+  "Previous day": "Previous day",
+  "Next day": "Next day",
+  "Close timeline": "Close timeline",
+  "Previous month": "Previous month",
+  "Next month": "Next month",
+  "{count} locations": "{count} locations",
+  "No locations": "No locations",
+  "Select a user and device to see their timeline.": "Select a user and device to see their timeline.",
+  "No locations on this day.": "No locations on this day.",
+  "Moving": "Moving",
+  "From {time}": "From {time}"
 }

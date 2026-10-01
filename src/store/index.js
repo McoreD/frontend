@@ -34,6 +34,11 @@ export default new Vuex.Store({
     elevationGain: 0,
     elevationLoss: 0,
     requestAbortController: null,
+    timeline: {
+      open: config.timeline.open,
+      // Coordinates of the segment selected in the timeline, drawn on the map
+      highlight: null,
+    },
   },
   getters,
   mutations,

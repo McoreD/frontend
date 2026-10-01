@@ -117,6 +117,17 @@
       </LMarker>
     </template>
 
+    <LPolyline
+      v-if="timeline.highlight"
+      :lat-lngs="timeline.highlight"
+      v-bind="highlightPolyline"
+    />
+    <LCircleMarker
+      v-if="timeline.highlight && timeline.highlight.length === 1"
+      :lat-lng="timeline.highlight[0]"
+      v-bind="highlightMarker"
+    />
+
     <template v-if="map.layers.heatmap">
       <LHeatmap
         v-if="filteredLocationHistoryLatLngs.length"
@@ -192,6 +203,18 @@ export default {
         ...this.$config.map.polyline,
         color: this.$config.map.polyline.color || this.$config.primaryColor,
       },
+      highlightPolyline: {
+        color: "#ff9800",
+        weight: 6,
+        opacity: 0.9,
+        fillColor: "transparent",
+      },
+      highlightMarker: {
+        color: "#ff9800",
+        fillColor: "#ff9800",
+        fillOpacity: 0.5,
+        radius: 12,
+      },
     };
   },
   computed: {
@@ -200,7 +223,7 @@ export default {
       "filteredLocationHistoryLatLngs",
       "filteredLocationHistoryLatLngGroups",
     ]),
-    ...mapState(["lastLocations", "map"]),
+    ...mapState(["lastLocations", "map", "timeline"]),
   },
   watch: {
     lastLocations() {
@@ -216,12 +239,34 @@ export default {
     this.$root.$on("fitView", () => {
       this.fitView();
     });
+    this.$root.$on("fitBounds", (latLngs) => {
+      if (!latLngs || latLngs.length === 0) return;
+      this.$refs.map.mapObject.fitBounds(new L.LatLngBounds(latLngs), {
+        maxZoom: 17,
+        ...this.fitPadding(),
+      });
+    });
   },
   methods: {
     ...mapMutations({
       setMapCenter: types.SET_MAP_CENTER,
       setMapZoom: types.SET_MAP_ZOOM,
     }),
+    /**
+     * Padding for fitBounds() so nothing ends up behind the timeline panel.
+     *
+     * @returns {Object} Leaflet fitBounds padding options
+     */
+    fitPadding() {
+      if (!this.timeline.open) return {};
+      const size = this.$refs.map.mapObject.getSize();
+      return this.$mq === "sm"
+        ? {
+            paddingTopLeft: [20, 20],
+            paddingBottomRight: [20, size.y / 2 + 20],
+          }
+        : { paddingTopLeft: [20, 20], paddingBottomRight: [380, 20] };
+    },
     /**
      * Fit all objects on the map into view.
      */
@@ -234,12 +279,14 @@ export default {
         this.filteredLocationHistoryLatLngs.length > 0
       ) {
         this.$refs.map.mapObject.fitBounds(
-          new L.LatLngBounds(this.filteredLocationHistoryLatLngs)
+          new L.LatLngBounds(this.filteredLocationHistoryLatLngs),
+          this.fitPadding()
         );
       } else if (this.map.layers.last && this.lastLocations.length > 0) {
         const locations = this.lastLocations.map((l) => L.latLng(l.lat, l.lon));
         this.$refs.map.mapObject.fitBounds(new L.LatLngBounds(locations), {
           maxZoom: this.maxNativeZoom,
+          ...this.fitPadding(),
         });
       }
     },

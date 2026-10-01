@@ -52,4 +52,11 @@ export default {
   [types.SET_REQUEST_ABORT_CONTROLLER](state, requestAbortController) {
     state.requestAbortController = requestAbortController;
   },
+  [types.SET_TIMELINE_OPEN](state, open) {
+    state.timeline.open = open;
+    if (!open) state.timeline.highlight = null;
+  },
+  [types.SET_TIMELINE_HIGHLIGHT](state, latLngs) {
+    state.timeline.highlight = latLngs;
+  },
 };

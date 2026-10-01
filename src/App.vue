@@ -3,6 +3,7 @@
     <AppHeader />
     <main>
       <router-view />
+      <DayTimeline v-if="$store.state.timeline.open" />
     </main>
     <InformationModal />
     <LoadingModal />
@@ -15,11 +16,12 @@ import { mapActions } from "vuex";
 import * as types from "@/store/mutation-types";
 import { log } from "@/logging";
 import AppHeader from "@/components/AppHeader.vue";
+import DayTimeline from "@/components/DayTimeline.vue";
 import InformationModal from "@/components/modals/InformationModal.vue";
 import LoadingModal from "@/components/modals/LoadingModal.vue";
 
 export default {
-  components: { AppHeader, InformationModal, LoadingModal },
+  components: { AppHeader, DayTimeline, InformationModal, LoadingModal },
   created() {
     document.documentElement.style.setProperty(
       "--color-primary",
@@ -38,6 +40,7 @@ export default {
           types.SET_MAP_CENTER,
           types.SET_MAP_ZOOM,
           types.SET_MAP_LAYER_VISIBILITY,
+          types.SET_TIMELINE_OPEN,
         ].includes(mutation.type)
       ) {
         this.updateUrlQuery();
@@ -65,6 +68,7 @@ export default {
         endDateTime: end,
         selectedUser: user,
         selectedDevice: device,
+        timeline,
       } = this.$store.state;
       const activeLayers = Object.keys(map.layers).filter(
         (key) => map.layers[key] === true
@@ -78,6 +82,7 @@ export default {
         ...(user !== null && { user }),
         ...(user !== null && device !== null && { device }),
         ...(activeLayers.length > 0 && { layers: activeLayers.join(",") }),
+        ...(timeline.open && { timeline: "1" }),
       };
       log("STATE", "Updating URL query from state");
       log(
