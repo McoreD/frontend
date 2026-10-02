@@ -92,6 +92,8 @@ const DEFAULT_CONFIG = {
     maxAccuracy: 500,
     minStayMinutes: 10,
     open: false,
+    regionMargin: 100,
+    regions: [],
     stayRadius: 150,
     travelSpeed: 30,
   },

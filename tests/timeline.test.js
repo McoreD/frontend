@@ -4,6 +4,7 @@ import {
   buildTimeline,
   countByDay,
   humanReadableDuration,
+  nearestRegion,
   placeName,
 } from "@/timeline";
 
@@ -66,6 +67,40 @@ describe("buildTimeline", () => {
     const segments = buildTimeline([at(HOME, 30), at(HOME, 0)]);
     expect(segments[0].start).toBe(T0);
     expect(segments[0].end).toBe(T0 + 30 * 60);
+  });
+});
+
+describe("regions", () => {
+  const regions = [
+    { desc: "Home", lat: HOME.lat, lon: HOME.lon, rad: 50 },
+    { desc: "Work", lat: WORK.lat, lon: WORK.lon, rad: 50 },
+  ];
+
+  test("names stays without inregions from the nearest region", () => {
+    const segments = buildTimeline(
+      [at(HOME, 0), at(HOME, 30), at(WORK, 60), at(WORK, 120)],
+      { regions }
+    );
+    expect(
+      segments.filter((s) => s.type === "stay").map((s) => s.place)
+    ).toEqual(["Home", "Work"]);
+  });
+
+  test("inregions from the app wins over the distance match", () => {
+    const segments = buildTimeline(
+      [at(HOME, 0, { inregions: ["Flat"] }), at(HOME, 30)],
+      { regions }
+    );
+    expect(segments[0].place).toBe("Flat");
+  });
+
+  test("radius plus margin, nearest wins", () => {
+    // ~111 m north of Home
+    const near = { lat: HOME.lat + 0.001, lng: HOME.lon };
+    expect(nearestRegion(near, regions, 100)).toBe("Home");
+    expect(nearestRegion(near, regions, 50)).toBe(null);
+    expect(nearestRegion(near, [], 100)).toBe(null);
+    expect(nearestRegion(near, [{ desc: "Bad" }], 100)).toBe(null);
   });
 });
 

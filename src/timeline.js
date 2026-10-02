@@ -15,6 +15,12 @@ import { distanceBetweenCoordinates } from "@/util";
  *   Ignore locations whose reported accuracy (meters) is worse than this
  * @property {Number} travelSpeed
  *   Assumed speed (km/h) for estimating when a stay ended before a silence
+ * @property {Array<Object>} regions
+ *   Known places `{ desc, lat, lon, rad }` (e.g. the app's regions) used to
+ *   name stays whose locations carry no region, POI or address
+ * @property {Number} regionMargin
+ *   A stay matches a region if its center is within the region's radius plus
+ *   this many meters (stay centers of sparse data are approximate)
  */
 
 /** @type {TimelineOptions} */
@@ -24,6 +30,8 @@ export const DEFAULT_TIMELINE_OPTIONS = {
   gapMinutes: 15,
   maxAccuracy: 500,
   travelSpeed: 30,
+  regions: [],
+  regionMargin: 100,
 };
 
 const toLatLng = (l) => ({ lat: l.lat, lng: l.lon });
@@ -42,6 +50,29 @@ const pathDistance = (latLngs) => {
     distance += distanceBetweenCoordinates(latLngs[i - 1], latLngs[i]);
   }
   return distance;
+};
+
+/**
+ * Find the known region closest to a coordinate, if it is close enough.
+ *
+ * @param {{lat: Number, lng: Number}} center Coordinate to name
+ * @param {Array<{desc: String, lat: Number, lon: Number, rad: Number}>} regions
+ * @param {Number} margin Extra meters allowed beyond each region's radius
+ * @returns {String|null} Name of the nearest matching region
+ */
+export const nearestRegion = (center, regions, margin) => {
+  let best = null;
+  let bestDistance = Infinity;
+  (regions || []).forEach((r) => {
+    if (!r || typeof r.lat !== "number" || typeof r.lon !== "number") return;
+    const distance = distanceBetweenCoordinates(center, toLatLng(r));
+    const radius = typeof r.rad === "number" && r.rad > 0 ? r.rad : 0;
+    if (distance <= radius + margin && distance < bestDistance) {
+      best = r.desc;
+      bestDistance = distance;
+    }
+  });
+  return best || null;
 };
 
 /**
@@ -173,7 +204,9 @@ export const buildTimeline = (locations, options = {}) => {
       start,
       end,
       center: centroid(cluster),
-      place: placeName(cluster),
+      place:
+        placeName(cluster) ||
+        nearestRegion(centroid(cluster), opts.regions, opts.regionMargin),
       count: cluster.length,
       endIsLast: isLast,
     };

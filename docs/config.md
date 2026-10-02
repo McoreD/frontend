@@ -593,6 +593,12 @@ interest (`poi`) or address (`addr`) of their locations, when available.
     travelSpeed: 30,
     // Show the panel when the page loads (also set by `?timeline=1`)
     open: false,
+    // Known places used to name stays whose locations have no region, POI
+    // or address (e.g. imported GPX tracks): the app's regions/waypoints,
+    // as { desc, lat, lon, rad } objects
+    regions: [],
+    // A stay matches a region within its radius plus this many meters
+    regionMargin: 100,
   }
   ```
 - Example:
