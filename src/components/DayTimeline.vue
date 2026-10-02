@@ -33,6 +33,7 @@
     <div class="day-timeline-calendar">
       <div class="calendar-nav">
         <button
+          v-if="showMonth"
           class="button button-flat button-icon"
           :title="$t('Previous month')"
           @click="shiftMonth(-1)"
@@ -41,12 +42,21 @@
         </button>
         <span>{{ month.format("MMMM YYYY") }}</span>
         <button
+          v-if="showMonth"
           class="button button-flat button-icon"
           :title="$t('Next month')"
           :disabled="month.isSame(today, 'month')"
           @click="shiftMonth(1)"
         >
           <ChevronRightIcon size="1x" :aria-label="$t('Next month')" />
+        </button>
+        <button
+          v-if="$mq === 'sm'"
+          class="button button-flat calendar-toggle"
+          :aria-expanded="monthExpanded ? 'true' : 'false'"
+          @click="monthExpanded = !monthExpanded"
+        >
+          {{ monthExpanded ? $t("Week") : $t("Month") }}
         </button>
       </div>
       <div class="calendar-grid" role="grid">
@@ -59,7 +69,7 @@
           {{ weekday }}
         </span>
         <button
-          v-for="cell in calendarCells"
+          v-for="cell in visibleCells"
           :key="cell.key"
           class="calendar-day"
           :class="{
@@ -166,6 +176,8 @@ export default {
       month: moment().startOf("month"),
       monthCounts: {},
       monthAbortController: null,
+      // On small screens only the selected week is shown until expanded
+      monthExpanded: false,
       today: moment().startOf("day"),
     };
   },
@@ -241,6 +253,13 @@ export default {
         });
       }
       return cells;
+    },
+    showMonth() {
+      return this.$mq !== "sm" || this.monthExpanded;
+    },
+    visibleCells() {
+      if (this.showMonth) return this.calendarCells;
+      return this.calendarCells.filter((c) => c.date.isSame(this.day, "week"));
     },
     maxCount() {
       return Math.max(1, ...Object.values(this.monthCounts));
@@ -352,7 +371,7 @@ export default {
   box-shadow: -2px 0 12px rgba(0, 0, 0, 0.15);
 
   &.day-timeline-sm {
-    top: 50%;
+    top: 40%;
     left: 0;
     width: auto;
     box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.15);
@@ -400,6 +419,14 @@ export default {
   align-items: center;
   justify-content: space-between;
   font-weight: bold;
+}
+
+.button.button-flat.calendar-toggle {
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: normal;
+  color: var(--color-primary);
+  border: 1px solid var(--color-separator);
 }
 
 .calendar-grid {

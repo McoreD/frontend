@@ -58,5 +58,7 @@
   "No locations on this day.": "No locations on this day.",
   "Moving": "Moving",
   "From {time}": "From {time}",
-  "Loading...": "Loading..."
+  "Loading...": "Loading...",
+  "Week": "Week",
+  "Month": "Month"
 }

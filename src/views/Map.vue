@@ -263,7 +263,7 @@ export default {
       return this.$mq === "sm"
         ? {
             paddingTopLeft: [20, 20],
-            paddingBottomRight: [20, size.y / 2 + 20],
+            paddingBottomRight: [20, size.y * 0.6 + 20],
           }
         : { paddingTopLeft: [20, 20], paddingBottomRight: [380, 20] };
     },
