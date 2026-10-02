@@ -246,3 +246,41 @@ export const humanReadableDuration = (seconds) => {
   const rest = minutes % 60;
   return `${hours} h ${String(rest).padStart(2, "0")} min`;
 };
+
+/**
+ * Short, human-readable label from a Nominatim reverse geocoding response
+ * (`format=jsonv2`), e.g. "Kings Park" or "12 Hay Street, Subiaco".
+ *
+ * @param {Object} response Parsed JSON response
+ * @returns {String|null} Label, or null if the response has no address
+ */
+export const addressLabel = (response) => {
+  if (!response || response.error) return null;
+  const a = response.address || {};
+  const street = [a.house_number, a.road || a.pedestrian || a.footway]
+    .filter(Boolean)
+    .join(" ");
+  const area =
+    a.suburb ||
+    a.neighbourhood ||
+    a.quarter ||
+    a.city_district ||
+    a.town ||
+    a.village ||
+    a.city ||
+    null;
+  const primary = response.name || street || area;
+  if (!primary) {
+    const parts = (response.display_name || "").split(",").map((s) => s.trim());
+    return parts.filter(Boolean).slice(0, 2).join(", ") || null;
+  }
+  return area && area !== primary ? `${primary}, ${area}` : primary;
+};
+
+/**
+ * Cache key for a coordinate, rounded to about 11 m.
+ *
+ * @param {{lat: Number, lng: Number}} c
+ * @returns {String}
+ */
+export const coordinateKey = (c) => `${c.lat.toFixed(4)},${c.lng.toFixed(4)}`;

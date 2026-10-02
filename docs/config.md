@@ -599,15 +599,27 @@ interest (`poi`) or address (`addr`) of their locations, when available.
     regions: [],
     // A stay matches a region within its radius plus this many meters
     regionMargin: 100,
+    // Name the remaining stays by reverse geocoding their center: a URL with
+    // {lat} and {lon} placeholders returning Nominatim `format=jsonv2` JSON.
+    // Off by default. Coordinates are rounded to 4 decimals (~11 m), looked
+    // up one at a time and cached for the page's lifetime.
+    reverseGeocodeUrl: null,
+    // Milliseconds between reverse geocoding requests (Nominatim's public
+    // instance allows at most one request per second)
+    reverseGeocodeDelay: 1100,
   }
   ```
 - Example:
   ```js
-  // Treat shorter visits as stays and open the panel by default
+  // Treat shorter visits as stays, open the panel by default and name
+  // stays outside regions with OpenStreetMap's Nominatim (this sends stay
+  // locations to that service; see its usage policy)
   window.owntracks.config = {
     timeline: {
       minStayMinutes: 5,
       open: true,
+      reverseGeocodeUrl:
+        "https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&lat={lat}&lon={lon}",
     },
   };
   ```

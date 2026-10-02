@@ -1,7 +1,9 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  addressLabel,
   buildTimeline,
+  coordinateKey,
   countByDay,
   humanReadableDuration,
   nearestRegion,
@@ -131,5 +133,29 @@ describe("humanReadableDuration", () => {
     expect(humanReadableDuration(0)).toBe("0 min");
     expect(humanReadableDuration(35 * 60)).toBe("35 min");
     expect(humanReadableDuration(125 * 60)).toBe("2 h 05 min");
+  });
+});
+
+describe("addressLabel", () => {
+  test("named places, streets, areas and fallbacks", () => {
+    expect(
+      addressLabel({ name: "Kings Park", address: { suburb: "West Perth" } })
+    ).toBe("Kings Park, West Perth");
+    expect(
+      addressLabel({
+        name: "",
+        address: { house_number: "12", road: "Hay Street", suburb: "Subiaco" },
+      })
+    ).toBe("12 Hay Street, Subiaco");
+    expect(addressLabel({ address: { suburb: "Subiaco" } })).toBe("Subiaco");
+    expect(addressLabel({ display_name: "A, B, C, D" })).toBe("A, B");
+    expect(addressLabel({ error: "Unable to geocode" })).toBe(null);
+    expect(addressLabel(null)).toBe(null);
+  });
+
+  test("coordinateKey rounds to 4 decimals", () => {
+    expect(coordinateKey({ lat: -31.953512, lng: 115.857048 })).toBe(
+      "-31.9535,115.8570"
+    );
   });
 });

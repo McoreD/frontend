@@ -117,8 +117,8 @@
           </span>
           <span class="segment-body">
             <template v-if="segment.type === 'stay'">
-              <strong>
-                {{ segment.place || formatCoordinate(segment.center) }}
+              <strong :title="formatCoordinate(segment.center)">
+                {{ stayLabel(segment) }}
               </strong>
               <small v-if="segment.endIsLast && segment.end === segment.start">
                 {{ $t("From {time}", { time: formatTime(segment.start) }) }}
@@ -158,10 +158,21 @@ import * as api from "@/api";
 import { DATE_TIME_FORMAT } from "@/constants";
 import { log } from "@/logging";
 import * as types from "@/store/mutation-types";
-import { buildTimeline, countByDay, humanReadableDuration } from "@/timeline";
+import {
+  addressLabel,
+  buildTimeline,
+  coordinateKey,
+  countByDay,
+  humanReadableDuration,
+} from "@/timeline";
 import { humanReadableDistance } from "@/util";
 
 const toUtc = (m) => m.clone().utc().format(DATE_TIME_FORMAT);
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Reverse geocoding results for the page's lifetime, keyed by rounded
+// coordinate (null: looked up, no address). Shared across panel re-opens.
+const addressCache = {};
 
 export default {
   components: {
@@ -178,6 +189,8 @@ export default {
       monthAbortController: null,
       // On small screens only the selected week is shown until expanded
       monthExpanded: false,
+      addresses: { ...addressCache },
+      geocodeRun: 0,
       today: moment().startOf("day"),
     };
   },
@@ -266,6 +279,12 @@ export default {
     },
   },
   watch: {
+    segments: {
+      handler() {
+        this.lookupAddresses();
+      },
+      immediate: true,
+    },
     target() {
       this.loadMonth();
     },
@@ -288,6 +307,7 @@ export default {
     this.loadMonth();
   },
   beforeDestroy() {
+    this.geocodeRun++;
     if (this.monthAbortController) this.monthAbortController.abort();
   },
   methods: {
@@ -300,6 +320,52 @@ export default {
     humanReadableDuration,
     formatTime(tst) {
       return moment.unix(tst).format("LT");
+    },
+    stayLabel(segment) {
+      return (
+        segment.place ||
+        this.addresses[coordinateKey(segment.center)] ||
+        this.formatCoordinate(segment.center)
+      );
+    },
+    /**
+     * Name stays that have no region, POI or address by reverse geocoding
+     * their center (timeline.reverseGeocodeUrl), one request at a time.
+     */
+    async lookupAddresses() {
+      const { reverseGeocodeUrl: template, reverseGeocodeDelay } =
+        this.$config.timeline;
+      if (!template) return;
+      const run = ++this.geocodeRun;
+      const pending = this.segments
+        .filter((s) => s.type === "stay" && !s.place)
+        .map((s) => s.center)
+        .filter((c) => !(coordinateKey(c) in addressCache));
+      for (const center of pending) {
+        const key = coordinateKey(center);
+        if (run !== this.geocodeRun) return;
+        if (key in addressCache) continue;
+        const [lat, lon] = key.split(",");
+        const url = template.replace("{lat}", lat).replace("{lon}", lon);
+        try {
+          const response = await fetch(url, {
+            headers: { Accept: "application/json" },
+          });
+          if (response.ok) {
+            addressCache[key] = addressLabel(await response.json());
+          } else {
+            log(
+              "TIMELINE",
+              `Reverse geocoding ${key}: HTTP ${response.status}`
+            );
+          }
+        } catch (error) {
+          log("TIMELINE", error);
+        }
+        if (key in addressCache)
+          this.$set(this.addresses, key, addressCache[key]);
+        await sleep(reverseGeocodeDelay);
+      }
     },
     formatCoordinate({ lat, lng }) {
       return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;

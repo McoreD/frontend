@@ -94,6 +94,8 @@ const DEFAULT_CONFIG = {
     open: false,
     regionMargin: 100,
     regions: [],
+    reverseGeocodeDelay: 1100,
+    reverseGeocodeUrl: null,
     stayRadius: 150,
     travelSpeed: 30,
   },
