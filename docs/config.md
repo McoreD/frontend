@@ -22,6 +22,7 @@ window.owntracks.config = {};
 
 ## Options
 
+- [`accountUrl`](#accounturl)
 - `api`
   - [`baseUrl`](#apibaseurl)
   - [`fetchOptions`](#apifetchoptions)
@@ -73,6 +74,22 @@ window.owntracks.config = {};
 - [`startDateTime`](#startdatetime)
 - [`timeline`](#timeline)
 - [`verbose`](#verbose)
+
+### `accountUrl`
+
+URL of an account/profile page provided by the deployment (e.g. a reverse
+proxy's sign-in or settings page). When set, a profile button linking to it is
+shown at the right end of the header, and the user filter uses a "users" icon
+so the two are not confused.
+
+- Type: [`String`] or `null`
+- Default: `null`
+- Example:
+  ```js
+  window.owntracks.config = {
+    accountUrl: "/account",
+  };
+  ```
 
 ### `api.baseUrl`
 

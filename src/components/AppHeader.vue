@@ -92,7 +92,13 @@
         </button>
       </div>
       <div class="nav-item">
-        <UserIcon size="1x" aria-hidden="true" role="img" />
+        <UsersIcon
+          v-if="$config.accountUrl"
+          size="1x"
+          aria-hidden="true"
+          role="img"
+        />
+        <UserIcon v-else size="1x" aria-hidden="true" role="img" />
         <select
           v-model="selectedUser"
           class="dropdown-button button"
@@ -152,6 +158,15 @@
           <InfoIcon size="1x" :aria-label="$t('Information')" role="img" />
         </button>
       </div>
+      <div v-if="$config.accountUrl" class="nav-item">
+        <a
+          class="button button-flat button-icon"
+          :href="$config.accountUrl"
+          :title="$t('Account')"
+        >
+          <UserIcon size="1x" :aria-label="$t('Account')" role="img" />
+        </a>
+      </div>
     </nav>
   </header>
 </template>
@@ -170,6 +185,7 @@ import {
   MenuIcon,
   SmartphoneIcon,
   UserIcon,
+  UsersIcon,
 } from "vue-feather-icons";
 
 import DatePicker from "vue2-datepicker";
@@ -193,6 +209,7 @@ export default {
     MenuIcon,
     SmartphoneIcon,
     UserIcon,
+    UsersIcon,
     DropdownButton,
   },
   data() {

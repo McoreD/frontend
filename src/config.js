@@ -8,6 +8,7 @@ startDateTime.setMonth(startDateTime.getMonth() - 1);
 startDateTime.setHours(0, 0, 0, 0);
 
 const DEFAULT_CONFIG = {
+  accountUrl: null,
   api: {
     baseUrl: `${window.location.protocol}//${window.location.host}`,
     fetchOptions: {},
