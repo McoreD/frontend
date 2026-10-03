@@ -29,6 +29,7 @@ window.owntracks.config = {};
 - [`endDateTime`](#enddatetime)
 - `filters`
   - [`minAccuracy`](#filtersminaccuracy)
+- [`headerLinks`](#headerlinks)
 - [`ignorePingLocation`](#ignorepinglocation)
 - [`locale`](#locale)
 - `map`
@@ -166,6 +167,20 @@ distance calculation.
     filters: {
       minAccuracy: 100,
     },
+  };
+  ```
+
+### `headerLinks`
+
+Extra buttons in the header linking to pages the deployment provides next to the
+frontend (e.g. reports). Each entry is `{ label, url, title? }`.
+
+- Type: [`Array`]
+- Default: `[]`
+- Example:
+  ```js
+  window.owntracks.config = {
+    headerLinks: [{ label: "Timesheet", url: "/timesheet" }],
   };
   ```
 
@@ -648,6 +663,7 @@ Whether to enable verbose mode or not.
 - Type: [`Boolean`]
 - Default: `false`
 
+[`array`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array
 [`boolean`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 [`date`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
 [`number`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number

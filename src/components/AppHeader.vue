@@ -91,6 +91,15 @@
           {{ $t("Timeline") }}
         </button>
       </div>
+      <div v-for="link in $config.headerLinks" :key="link.url" class="nav-item">
+        <a
+          class="button button-outline"
+          :href="link.url"
+          :title="link.title || link.label"
+        >
+          {{ link.label }}
+        </a>
+      </div>
       <div class="nav-item">
         <UsersIcon
           v-if="$config.accountUrl"

@@ -17,6 +17,7 @@ const DEFAULT_CONFIG = {
   filters: {
     minAccuracy: null,
   },
+  headerLinks: [],
   ignorePingLocation: true,
   locale: "en-US",
   map: {
